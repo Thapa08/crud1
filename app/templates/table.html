@@ -1,0 +1,33 @@
+{% extends 'navbar.html' %}
+{% block title %} Table {% endblock %}
+
+{% block body %}
+ <h1>Data in this app</h1>
+
+ <table class="table table-success table-striped">
+    <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">First name</th>
+          <th scope="col">Last name</th>
+          <th scope="col">email</th>
+          <th scope="col">Phone number</th>
+          <th scope="col">Options</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for x in data %}
+        <tr>
+          <th scope="row">{{x.id}}</th>
+          <td>{{x.firstname}}</td>
+          <td>{{x.lastname}}</td>
+          <td>{{x.email}}</td>
+          <td>{{x.phone_number}}</td>
+          <td>
+            <a href="{% url 'updateData' x.id %}" class=" btn btn-primary">Edit</a>
+            <a href="{% url 'deleteData' x.id %}" class="btn btn-danger">Delete</a>
+          </td>
+        </tr>
+        {% endfor %}
+      
+{% endblock body %}
