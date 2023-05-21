@@ -1,7 +1,8 @@
-{% extends 'navbar.html' %}
+{% extends 'index.html' %}
 {% block title %} Home {% endblock %}
-
+{% block name %} {{name}} {% endblock %}
 {% block body %}
+{% if user.is_authenticated %}
  <h1>Insert your information</h1>
 
 <div class="row justify-content-center">
@@ -13,11 +14,11 @@
                <h5 class="card-title"><h1>Member Form</h1></h5>
            </div>
            {{ form.as_p }}          
-             <button class="btn btn-primary" type="submit" value="submit">Submit</button>
+             <button class="btn btn-primary" type="submit" value="submit" onclick="">Submit</button>
            </div>
          </form>
 
     </div>
 </div>
-  
+  {% endif %}
 {% endblock body %}
