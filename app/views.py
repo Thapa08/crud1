@@ -9,57 +9,65 @@ from django.contrib.auth.forms import AuthenticationForm,PasswordChangeForm,SetP
 from django.contrib.auth import authenticate,login,logout,update_session_auth_hash
 from .forms import SignUpForm,UserEditForm,AdminEditForm
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from rest_framework.views import APIView
+from rest_framework.response import Response
 # Create your views here.
-class home(View):
-    def get(self,request):
-        form = MemberForm()
-        context = {
-              'form':form,
-                'name':request.user
-        }
-        return render(request,'home.html',context)
-      
-    def post(self,request):
-        form = MemberForm(request.POST)
+
+
+
+# def home(request):
+#         if 
+#         form = MemberForm(user=request.user)
+#         context = {
+#               'form':form,
+#                 'name':request.user
+#         }
+#         return render(request,'home.html',context)
+    
+#         try:
+#             form = MemberForm(user=request.user,data=request.POST)
+#             if form.is_valid():
+#                 data=form.save(commit=False)
+#                 data.user=request.user
+#                 form.save()
+#                 return redirect("content")
+#             else:
+#                 return redirect("home")
+#         except Exception as e:
+#             return HttpResponse(f"An error occurred: {str(e)}")
+
+
+def home(request):
+    context={}
+    form = MemberForm(user=request.user,data=request.POST or None)
+    ip = request.session.get('ip',0)
+    if request.method == 'POST':      
         try:
             if form.is_valid():
                 data=form.save(commit=False)
                 data.user=request.user
                 form.save()
-                return redirect("content")
-            else:
-                return HttpResponse("Invalid form data")
+                return redirect('content')
         except Exception as e:
             return HttpResponse(f"An error occurred: {str(e)}")
+    
+    context['form']=form
+    context['ip']=ip
+    return render(request,'home.html',context)
 
 
-# def home(request):
-#     if request.method == 'POST':      
-#         form = MemberForm(request.POST)
-#         try:
-#             if form.is_valid():
-#                 form.save()
-#                 return HttpResponse("Data saved")
-#             else:
-#                 return HttpResponse("Invalid form data")
-#         except Exception as e:
-#             return HttpResponse(f"An error occurred: {str(e)}")
-#     form = MemberForm()
-#     context = {
-#         'form':form,
-#     }
-#     return render(request,'home.html',context)
-
+@login_required()
 def updateData(request, id):
     if request.method == 'POST':
         updData = Member.objects.get(id=id)
-        form = MemberForm(request.POST, instance=updData)
+        form = MemberForm(data=request.POST, instance=updData)
         if form.is_valid():
             form.save()
             return redirect('content')
     else:
         updData = Member.objects.get(id=id)
-        form = MemberForm(instance=updData)
+        form = MemberForm(user=request.user,instance=updData)
     context={
         'id':id,
         'form':form,
@@ -67,6 +75,7 @@ def updateData(request, id):
     return render(request,'update.html',context)
     
 
+@login_required()
 def deleteData(request, id):
     # delData = get_object_or_404(Member, pk=id)
     delData=Member.objects.get(id=id)
@@ -74,11 +83,13 @@ def deleteData(request, id):
     return redirect('content')
 
 
+
 def content(request):
     if request.user.is_authenticated:
         data = Member.objects.filter(user=request.user)
         if request.user.is_superuser == True:
             data = Member.objects.all()
+            print("data",type(data),data)
         context = {
             'data': data
         }
@@ -117,22 +128,28 @@ def signup(request):
     return render(request,'signup.html',{'form':form})
 
 #logout
+@login_required()
 def logout_user(request):
     logout(request)
     return redirect('login')
 
 #change password while logged in
+@login_required()
 def change_pass_logged_in(request):
-    if request.user.is_authenticated:
-        if request.method == 'POST':
-            form = PasswordChangeForm(user=request.user, data = request.POST)
-            if form.is_valid():
-                form.save()
-                update_session_auth_hash(request,form.user) # Doesnt log out when password is changed
-                messages.success(request,"Password channged sucessfully !")
-                return redirect('contents')
-        else:
-            form = PasswordChangeForm(user=request.user)
-        return render(request,'change_password.html',{'form':form})
+    if request.method == 'POST':
+        form = PasswordChangeForm(user=request.user, data = request.POST)
+        if form.is_valid():
+            form.save()
+            update_session_auth_hash(request,form.user) # Doesnt log out when password is changed
+            messages.success(request,"Password channged sucessfully !")
+            return redirect('contents')
     else:
-        return redirect('login')
+        form = PasswordChangeForm(user=request.user)
+    return render(request,'change_password.html',{'form':form})
+class Api_create(APIView):
+    @login_required
+    def get(self,request):
+        print("hello")
+        data={'name':'Ram','age':20}
+        return Response(data)
+    

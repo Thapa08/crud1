@@ -4,8 +4,8 @@ from django.contrib.auth.models import User
 # Create your models here.
 
 class Member(models.Model):
-    user = models.ForeignKey(User,on_delete=models.CASCADE,null=True)
-    firstname = models.CharField(max_length=255)
+    user = models.ForeignKey(User,on_delete=models.CASCADE,null=True,verbose_name="User")
+    firstname = models.CharField(max_length=255,verbose_name='First Name')
     lastname = models.CharField(max_length=255)
     email = models.EmailField(max_length=255)
     phone_number = models.IntegerField( null=True ,blank = True)

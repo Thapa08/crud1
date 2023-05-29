@@ -1,0 +1,37 @@
+{% extends 'index.html' %}
+{% block title %} Home {% endblock %}
+{% block name %} {{name}} {% endblock %}
+{% block body %}
+{% if user.is_authenticated %}
+ <h1>Insert your information</h1>
+<p>Your IP address is: {{ip}}</p>
+<div class="row justify-content-center">
+    <div class="col-6">
+        <form action="" method="POST" novalidate>
+           {% csrf_token %}
+           <div class="card">
+             <div class="card-body">
+               <h5 class="card-title"><h1>Member Form</h1></h5>
+            </div>
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+            {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+            {% endfor %}
+            {% endif %}
+            {% for x in form %}
+            {{ x.label_tag }} {{x}} 
+            {% for error in field.errors %}
+            <span class= 'errorlist'> {{error}} </span>
+            {% endfor %}
+            <span class='errorlist'>{{x.errors|striptags}}</span>  <br>
+            {% endfor %}       
+          
+            <button class="btn btn-primary" type="submit" value="submit" onclick="">Submit</button>
+          </div>
+        </form>
+
+    </div>
+</div>
+  {% endif %}
+{% endblock body %}

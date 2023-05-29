@@ -1,0 +1,92 @@
+<script>
+
+// Add button functionality
+$("#btn-add").click(function(){
+    $("#form").slideToggle()
+})
+
+// Insert Notes
+$("#btn-save").click(function(){
+    // console.log("Save button clicked");
+    let output = ""
+    let id = $("#noteid").val();
+    // console.log(id);
+    let heading = $("#headid").val();
+    let content = $("#contentid").val();
+    let csrf = $('input[name=csrfmiddlewaretoken]').val();
+    let mydata = {id:id , heading:heading , content:content, csrfmiddlewaretoken: csrf}
+    $.ajax({
+        url: "{% url 'save' %}",
+        method: "POST",
+        data: mydata,
+        success: function(data){
+            x = data.note_data;
+            if(data.status == 1){
+                for(i=0;i<x.length;i++){
+                    output += `
+                    <div class="card text-dark bg-info mb-3" style="max-width: 18rem;" id="notes-container">
+                    <div class="card-header card-title"><strong>${x[i].heading}</strong> 
+                    <span class="delete" note-id="${x[i].id}"><i class="float-end fa-solid fa-trash p-2" ></i></span>
+                    <span class="edit" note-id="${x[i].id}"><i class="float-end p-2 fa-solid fa-pen-to-square"></i></span>
+                    </div>
+                    <div class="card-body">
+                    <p class="card-text">${x[i].content}</p>
+                    </div>
+                    </div>
+                    `
+                }
+                $("#notes-container").html(output);
+                $("#form")[0].reset();
+                $("#noteid").val("");
+            }else if(data.status == 0){
+                console.log("Unable to save data");
+                $("#form")[0].reset();
+                $("#noteid").val("");
+            }
+        }
+    });
+});
+
+// Delete notes
+$("#notes-container").on("click",".del",function(){
+    console.log("Delete icon clicked");
+    let id = $(this).attr('note-id');
+    console.log(id);
+    let csrf = $('input[name=csrfmiddlewaretoken]').val();
+    mydata = {id:id,csrfmiddlewaretoken: csrf}
+    mythis = this;
+    $.ajax({
+        url: "{% url 'delete' %}",
+        method: "POST",
+        data:mydata,
+        success:function(data){
+            if(data.status == 1){
+                $(mythis).closest(".card").fadeOut();
+            }else if(data.status == 0){
+                console.log("Unable to delete data");
+            }
+        }
+    });
+
+});
+
+// Edit notes
+$("#notes-container").on('click','.edit',function(){
+    console.log('Edit icon clicked');
+    let id = $(this).attr('note-id');
+    let csrf = $('input[name=csrfmiddlewaretoken]').val();
+    mydata = {id:id, csrfmiddlewaretoken:csrf}
+    $.ajax({
+        url: "{% url 'edit' %}",
+        method: 'POST',
+        data:mydata,
+        success: function(data){
+            $("#form").fadeIn();
+            $("#noteid").val(data.note_data.id)
+            $("#headid").val(data.note_data.heading)
+            $("#contentid").val(data.note_data.content)
+        }
+    });
+});
+
+</script>

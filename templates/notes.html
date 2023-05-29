@@ -1,0 +1,37 @@
+{% extends 'index.html' %}
+{% block title %} Notes {% endblock %}
+
+
+{% block body %}
+<!-- Add button -->
+<h1 class="m-2"><strong>Notes</strong></h1>
+<button type="button" class="btn btn-outline-secondary m-2" id="btn-add">Add Notes</button>
+<!-- Form -->
+<div id="form" class="alert alert-danger" style="display: none;">
+<form action="" method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="noteid" id="noteid">
+    {{form.as_p}}
+    <button class="btn btn-success" id="btn-save">Save</button>
+</form>
+</div>
+
+<!-- Show Notes -->
+
+<div class="p-3 border-2" id="notes-container">
+{% for note in data %}
+<div class="card text-dark bg-info mb-3" style="max-width: 18rem;">
+  <div class="card-header card-title"><strong>{{note.heading}}</strong> 
+    <span class="del" note-id="{{note.id}}"><i class="float-end fa-solid fa-trash p-2" ></i></span>
+    <span class="edit" note-id="{{note.id}}"><i class="float-end fa-solid fa-pen-to-square p-2"></i></span>
+  </div>
+  <div class="card-body">
+    <p class="card-text">{{note.content}}</p>
+  </div>
+</div>
+
+{% endfor %}
+
+
+</div>
+{% endblock body %}

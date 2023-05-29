@@ -2,17 +2,27 @@ from django import forms
 from .models import Member
 from django.contrib.auth.forms import UserCreationForm,UserChangeForm
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 
 class MemberForm(forms.ModelForm):
+    # name = forms.CharField(error_messages={'required':'Enter your name'})      
+    user = forms.ModelChoiceField(queryset=User.objects.all())
+    def __init__(self,user,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+        self.fields['user'].queryset=User.objects.filter(id=user.id)
+        self.fields['user'].widget.attrs.update({'class':'form-control'})
+
+    def clean(self):
+        firstname = self.cleaned_data.get('firstname',None)
+        data=Member.objects.filter(firstname__iexact=firstname)
+        if data.exists():
+            self.add_error('firstname','Firstname already exists')
+    
+
+
     class Meta:
         model = Member
-        fields = ["firstname","lastname","email","phone_number"]
-        labels={
-            "firstname":"First name",
-            "lastname":"Last name",
-            "email":"Email",
-            "phone_number":"Phone number"
-        }
+        fields = ["user","firstname","lastname","email","phone_number"]
         widgets={
             "firstname":forms.TextInput(attrs={"class":"form-control"}),
             "lastname":forms.TextInput(attrs={"class":"form-control"}),
@@ -21,7 +31,16 @@ class MemberForm(forms.ModelForm):
         }
 
 class SignUpForm(UserCreationForm):
+    error_css_class = 'error'
     password2 = forms.CharField(label='Confirm Password', widget=forms.PasswordInput)
+
+    def clean_username(self):
+        uname = self.cleaned_data.get('username',None)
+        data = User.objects.filter(username__iexact=uname)
+        if data.exists():
+            raise forms.ValidationError("Username already exists")
+        return uname
+    
     class Meta:
         model = User
         fields = ['username','first_name','last_name','email']
@@ -50,3 +69,4 @@ class AdminEditForm(UserChangeForm):
         labels = {
             'email': 'Email'
         }
+
