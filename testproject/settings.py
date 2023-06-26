@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'app',
     'note_app',
     'rest_framework',
+    'dropdown',
 ]
 
 MIDDLEWARE = [

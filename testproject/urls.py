@@ -24,6 +24,7 @@ urlpatterns = [
     path('', include('app.urls')),
     path('admin/', admin.site.urls),
     path('notes/', include('note_app.urls')),
+    path('dropdown/', include('dropdown.urls')),
 
 ]
 if settings.DEBUG:

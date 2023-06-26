@@ -1,0 +1,45 @@
+{% extends 'index.html' %}
+{% block title %} Dropdown {% endblock %}
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-6">
+        <form action="" method="POST" novalidate>
+           {% csrf_token %}
+           <div class="card">
+             <div class="card-body">
+               <h5 class="card-title"><h1>Files Form</h1></h5>
+            </div>
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+            {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+            {% endfor %}
+            {% endif %}
+            <div id="dropdownid">
+                Select:
+                {{form.dropdown}}
+            </div>
+            <div id="textid">
+                Text:
+                {{form.textarea}}
+            </div>
+
+            <div id="imageid">
+                Image:
+                {{form.textarea}}
+            </div>
+          
+            <div id="audioid">
+                Audio:
+                {{form.textarea}}
+            </div>
+
+            <button class="btn btn-primary" type="submit" value="submit" onclick="">Submit</button>
+          </div>
+        </form>
+
+    </div>
+</div>
+
+
+{% endblock body %}
